@@ -1,0 +1,3 @@
+- hosts: host
+  roles:
+    - delete_zabbix_agent

@@ -1,0 +1,4 @@
+zabbix_server: zabbix.cutt.com
+src_dir: /app/src
+centos_zabbix_version: 3.2.1-1.el6.x86_64
+ubuntu_zabbix_version: 3.2.0-1+trusty_amd64

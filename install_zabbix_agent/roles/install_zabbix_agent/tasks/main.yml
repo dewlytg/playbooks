@@ -1,0 +1,24 @@
+- name: create packets dir
+  file: path={{ src_dir }} state=directory owner="root" group="root" mode="755"
+
+- name: copy zabbix agent file to remote in the centos
+  copy: src=zabbix-agent-{{ centos_zabbix_version }}.rpm dest={{ src_dir }}  mode=0644 owner=root group=root
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 6
+
+- name: copy zabbix agent file to remote in the ubuntu
+  copy: src=zabbix-agent_{{ ubuntu_zabbix_version }}.deb dest={{ src_dir }}  mode=0644 owner=root group=root
+  when: ansible_os_family == "Debian" and ansible_distribution_major_version|int == 14
+
+- name: install zabbix agent in the centos
+  shell: rpm -vih {{ src_dir }}/zabbix-agent-{{ centos_zabbix_version }}.rpm
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 6
+
+- name: install zabbix agent in the ubuntu
+  shell: dpkg -i {{ src_dir }}/zabbix-agent_{{ ubuntu_zabbix_version }}.deb
+  when: ansible_os_family == "Debian" and ansible_distribution_major_version|int == 14
+
+- name: copy zabbix configure file to client machine
+  template: src=zabbix_agentd.conf.j2 dest=/etc/zabbix/zabbix_agentd.conf mode=0644 owner=root group=root
+
+- name: restart zabbix
+  service: name=zabbix-agent state=restarted
