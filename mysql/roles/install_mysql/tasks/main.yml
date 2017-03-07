@@ -1,0 +1,27 @@
+- name: create packets dir
+  file: path={{ item }} state=directory owner="root" group="root" mode="755"
+  with_items:
+    - "{{ src_dir }}"
+    - "{{ scripts_dir }}"
+
+- name: copy mysql packets  to remote in the centos
+  copy: src=mysql-{{ mysql_version }}.tar.gz dest={{ src_dir }}  mode=0644 owner=root group=root
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 6
+
+- name: copy mysql install script  to remote in the centos
+  template: src={{ item }} dest={{ scripts_dir }}  mode=0644 owner=root group=root
+  with_items:
+    - my.cnf
+    - mysql_install.sh
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 6
+
+- name: install mysql server in the centos
+  shell: sh {{scripts_dir}}/mysql_install.sh install
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 6
+
+- name: initialtion mysql server in the centos
+  shell: sh {{scripts_dir}}/mysql_install.sh init
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 6
+
+- name: restart mysqld
+  service: name=mysqld state=restarted
